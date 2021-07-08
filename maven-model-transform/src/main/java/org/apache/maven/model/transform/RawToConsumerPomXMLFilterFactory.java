@@ -21,11 +21,7 @@ package org.apache.maven.model.transform;
 
 import java.nio.file.Path;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-
-import org.apache.maven.model.transform.sax.AbstractSAXFilter;
-import org.xml.sax.SAXException;
+import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
 /**
  *
@@ -41,20 +37,19 @@ public class RawToConsumerPomXMLFilterFactory
         this.buildPomXMLFilterFactory = buildPomXMLFilterFactory;
     }
 
-    public final RawToConsumerPomXMLFilter get( Path projectPath )
-        throws SAXException, ParserConfigurationException, TransformerConfigurationException
+    public final XmlPullParser get( XmlPullParser parser, Path projectPath )
     {
-        BuildToRawPomXMLFilter parent = buildPomXMLFilterFactory.get( projectPath );
+        parser = buildPomXMLFilterFactory.get( parser, projectPath );
 
 
         // Ensure that xs:any elements aren't touched by next filters
-        AbstractSAXFilter filter = new FastForwardFilter( parent );
+        parser = new FastForwardFilter( parser );
 
         // Strip modules
-        filter = new ModulesXMLFilter( filter );
+        parser = new ModulesXMLFilter( parser );
         // Adjust relativePath
-        filter = new RelativePathXMLFilter( filter );
+        parser = new RelativePathXMLFilter( parser );
 
-        return new RawToConsumerPomXMLFilter( filter );
+        return parser;
     }
 }
