@@ -29,7 +29,7 @@ public class ModulesXMLFilterTest
 {
 
     @Override
-    protected ModulesXMLFilter getFilter(XmlPullParser parser)
+    protected ModulesXMLFilter getFilter( XmlPullParser parser )
     {
         return new ModulesXMLFilter( parser );
     }

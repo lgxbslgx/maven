@@ -59,6 +59,10 @@ public class DefaultModelReader
     @Inject
     private ModelSourceTransformer transformer;
 
+    private Method readMethod;
+
+    private Method readMethodEx;
+
     public void setTransformer( ModelSourceTransformer transformer )
     {
         this.transformer = transformer;
@@ -131,33 +135,20 @@ public class DefaultModelReader
             parser.setInput( reader );
 
             TransformerContext context = getTransformerContext( options );
-            if ( context != null )
-            {
-                parser = transformer.transform( parser, pomFile, context );
-            }
+            XmlPullParser transformingParser = context != null
+                    ? transformer.transform( parser, pomFile, context ) : parser;
 
-            // TODO: avoid or at least cache reflection data
             InputSource source = getSource( options );
             boolean strict = isStrict( options );
             try
             {
                 if ( source != null )
                 {
-                    MavenXpp3ReaderEx mr = new MavenXpp3ReaderEx();
-                    Method readMethod = mr.getClass().getDeclaredMethod( "read",
-                            XmlPullParser.class, boolean.class, InputSource.class );
-                    readMethod.setAccessible( true );
-                    Object model = readMethod.invoke( mr, parser, strict, source );
-                    return (Model) model;
+                    return readModelEx( transformingParser, source, strict );
                 }
                 else
                 {
-                    MavenXpp3Reader mr = new MavenXpp3Reader();
-                    Method readMethod = mr.getClass().getDeclaredMethod( "read",
-                            XmlPullParser.class, boolean.class );
-                    readMethod.setAccessible( true );
-                    Object model = readMethod.invoke( mr, parser, strict );
-                    return (Model) model;
+                    return readModel( transformingParser, strict );
                 }
             }
             catch ( InvocationTargetException e )
@@ -182,6 +173,33 @@ public class DefaultModelReader
         {
             throw new IOException( "Unable to transform pom", e );
         }
+    }
+
+    private Model readModel( XmlPullParser parser, boolean strict )
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
+    {
+        if ( readMethod == null )
+        {
+            readMethod = MavenXpp3Reader.class.getDeclaredMethod( "read", XmlPullParser.class, boolean.class );
+            readMethod.setAccessible( true );
+        }
+        MavenXpp3Reader mr = new MavenXpp3Reader();
+        Object model = readMethod.invoke( mr, parser, strict );
+        return ( Model ) model;
+    }
+
+    private Model readModelEx( XmlPullParser parser, InputSource source, boolean strict )
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException
+    {
+        if ( readMethodEx == null )
+        {
+            readMethodEx = MavenXpp3ReaderEx.class.getDeclaredMethod( "read",
+                    XmlPullParser.class, boolean.class, InputSource.class );
+            readMethodEx.setAccessible( true );
+        }
+        MavenXpp3ReaderEx mr = new MavenXpp3ReaderEx();
+        Object model = readMethodEx.invoke( mr, parser, strict, source );
+        return ( Model ) model;
     }
 
 }

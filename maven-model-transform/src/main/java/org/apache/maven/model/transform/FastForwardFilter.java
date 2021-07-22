@@ -29,7 +29,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * This filter will skip all following filters and write directly to the output.
- * Should be used in case of a DOM that should not be effected by other filters, even though the elements match
+ * Should be used in case of a DOM that should not be effected by other filters, even though the elements match.
  *
  * @author Robert Scholte
  * @author Guillaume Nodet
@@ -90,7 +90,8 @@ class FastForwardFilter extends BufferingParser
         }
         else if ( xmlPullParser.getEventType() == END_TAG )
         {
-            if ( --domDepth == 0 )
+            domDepth--;
+            if ( domDepth == 0 )
             {
                 enable();
             }

@@ -24,7 +24,7 @@ import java.nio.file.Path;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
 /**
- *
+ * @author Guillaume Nodet
  * @author Robert Scholte
  * @since 4.0.0
  */
@@ -37,10 +37,11 @@ public class RawToConsumerPomXMLFilterFactory
         this.buildPomXMLFilterFactory = buildPomXMLFilterFactory;
     }
 
-    public final XmlPullParser get( XmlPullParser parser, Path projectPath )
+    public final XmlPullParser get( XmlPullParser orgParser, Path projectPath )
     {
-        parser = buildPomXMLFilterFactory.get( parser, projectPath );
+        XmlPullParser parser = orgParser;
 
+        parser = buildPomXMLFilterFactory.get( parser, projectPath );
 
         // Ensure that xs:any elements aren't touched by next filters
         parser = new FastForwardFilter( parser );

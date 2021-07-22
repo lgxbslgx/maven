@@ -59,12 +59,9 @@ public class RelativePathXMLFilter extends NodeBufferingParser
                 skip = false;
                 event = null;
             }
-            else
+            else if ( skip )
             {
-                if ( skip )
-                {
-                    event = null;
-                }
+                event = null;
             }
             if ( prev != null )
             {

@@ -50,9 +50,11 @@ public class BuildToRawPomXMLFilterFactory
      *
      * @param projectFile will be used by ConsumerPomXMLFilter to get the right filter
      */
-    public final XmlPullParser get( XmlPullParser parser, Path projectFile )
+    public final XmlPullParser get( XmlPullParser orgParser, Path projectFile )
 
     {
+        XmlPullParser parser = orgParser;
+
         if ( getDependencyKeyToVersionMapper() != null )
         {
             parser = new ReactorDependencyXMLFilter( parser, getDependencyKeyToVersionMapper() );
