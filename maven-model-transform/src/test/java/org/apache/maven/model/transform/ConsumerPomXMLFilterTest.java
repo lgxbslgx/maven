@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
 {
     @Override
-    protected XmlPullParser getFilter( XmlPullParser parser )
+    protected XmlPullParser getFilter( XmlPullParser orgParser )
     {
         final BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory = new BuildToRawPomXMLFilterFactory( true )
         {
@@ -69,8 +69,8 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
 
         };
 
-        parser = new RawToConsumerPomXMLFilterFactory( buildPomXMLFilterFactory )
-                        .get( parser, Paths.get( "pom.xml" ) );
+        XmlPullParser parser = new RawToConsumerPomXMLFilterFactory( buildPomXMLFilterFactory )
+                        .get( orgParser, Paths.get( "pom.xml" ) );
         return parser;
     }
 
